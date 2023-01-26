@@ -25,6 +25,9 @@ defmodule PartyWeb.Router do
 
     live "/contacts/:id", ContactLive.Show, :show
     live "/contacts/:id/show/edit", ContactLive.Show, :edit
+
+    get "/foo", PageController, :foo
+    post "/foo", PageController, :create
   end
 
   # Other scopes may use custom stacks.

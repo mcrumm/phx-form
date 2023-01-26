@@ -6,4 +6,14 @@ defmodule PartyWeb.PageController do
     # so skip the default app layout.
     render(conn, :home, layout: false)
   end
+
+  def foo(conn, params) do
+    dbg(params)
+    render(conn, :foo)
+  end
+
+  def create(conn, %{"foo" => foo_params}) do
+    dbg(foo_params)
+    render(conn, :foo)
+  end
 end
