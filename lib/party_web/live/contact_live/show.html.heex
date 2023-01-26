@@ -1,0 +1,31 @@
+<.header>
+  Contact <%= @contact.id %>
+  <:subtitle>This is a contact record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/contacts/#{@contact}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit contact</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="First name"><%= @contact.first_name %></:item>
+  <:item title="Last name"><%= @contact.last_name %></:item>
+  <:item title="Email"><%= @contact.email %></:item>
+  <:item title="Mobile number"><%= @contact.mobile_number %></:item>
+  <:item title="Favorite color"><%= @contact.favorite_color %></:item>
+  <:item title="Developer"><%= @contact.developer %></:item>
+</.list>
+
+<.back navigate={~p"/contacts"}>Back to contacts</.back>
+
+<.modal :if={@live_action == :edit} id="contact-modal" show on_cancel={JS.patch(~p"/contacts/#{@contact}")}>
+  <.live_component
+    module={PartyWeb.ContactLive.FormComponent}
+    id={@contact.id}
+    title={@page_title}
+    action={@live_action}
+    contact={@contact}
+    navigate={~p"/contacts/#{@contact}"}
+  />
+</.modal>

@@ -1,0 +1,44 @@
+<.header>
+  Listing Contacts
+  <:actions>
+    <.link patch={~p"/contacts/new"}>
+      <.button>New Contact</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="contacts" rows={@contacts} row_click={&JS.navigate(~p"/contacts/#{&1}")}>
+  <:col :let={contact} label="First name"><%= contact.first_name %></:col>
+  <:col :let={contact} label="Last name"><%= contact.last_name %></:col>
+  <:col :let={contact} label="Email"><%= contact.email %></:col>
+  <:col :let={contact} label="Mobile number"><%= contact.mobile_number %></:col>
+  <:col :let={contact} label="Favorite color"><%= contact.favorite_color %></:col>
+  <:col :let={contact} label="Developer"><%= contact.developer %></:col>
+  <:action :let={contact}>
+    <div class="sr-only">
+      <.link navigate={~p"/contacts/#{contact}"}>Show</.link>
+    </div>
+    <.link patch={~p"/contacts/#{contact}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={contact}>
+    <.link phx-click={JS.push("delete", value: %{id: contact.id})} data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="contact-modal"
+  show
+  on_cancel={JS.navigate(~p"/contacts")}
+>
+  <.live_component
+    module={PartyWeb.ContactLive.FormComponent}
+    id={@contact.id || :new}
+    title={@page_title}
+    action={@live_action}
+    contact={@contact}
+    navigate={~p"/contacts"}
+  />
+</.modal>
