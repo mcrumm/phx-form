@@ -1,1 +1,3 @@
-<.form :let={f} for={@conn.params} as={:foo} action="/form" method="POST"></.form>
+<.form :let={f} for={@conn.params} as={:foo} action="/form" method="POST">
+  <%= dbg(f[:first_name]) %>
+</.form>

@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :elixir, :dbg_callback, {PartyWeb.DBG, :debug_html, [config_env()]}
+
 config :party,
   ecto_repos: [Party.Repo]
 
