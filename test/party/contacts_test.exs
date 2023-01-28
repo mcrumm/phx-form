@@ -8,7 +8,14 @@ defmodule Party.ContactsTest do
 
     import Party.ContactsFixtures
 
-    @invalid_attrs %{developer: nil, email: nil, favorite_color: nil, first_name: nil, last_name: nil, mobile_number: nil}
+    @invalid_attrs %{
+      developer: nil,
+      email: nil,
+      favorite_color: nil,
+      first_name: nil,
+      last_name: nil,
+      mobile_number: nil
+    }
 
     test "list_contacts/0 returns all contacts" do
       contact = contact_fixture()
@@ -21,7 +28,14 @@ defmodule Party.ContactsTest do
     end
 
     test "create_contact/1 with valid data creates a contact" do
-      valid_attrs = %{developer: true, email: "some email", favorite_color: :red, first_name: "some first_name", last_name: "some last_name", mobile_number: "some mobile_number"}
+      valid_attrs = %{
+        developer: true,
+        email: "some email",
+        favorite_color: :red,
+        first_name: "some first_name",
+        last_name: "some last_name",
+        mobile_number: "some mobile_number"
+      }
 
       assert {:ok, %Contact{} = contact} = Contacts.create_contact(valid_attrs)
       assert contact.developer == true
@@ -38,7 +52,15 @@ defmodule Party.ContactsTest do
 
     test "update_contact/2 with valid data updates the contact" do
       contact = contact_fixture()
-      update_attrs = %{developer: false, email: "some updated email", favorite_color: :green, first_name: "some updated first_name", last_name: "some updated last_name", mobile_number: "some updated mobile_number"}
+
+      update_attrs = %{
+        developer: false,
+        email: "some updated email",
+        favorite_color: :green,
+        first_name: "some updated first_name",
+        last_name: "some updated last_name",
+        mobile_number: "some updated mobile_number"
+      }
 
       assert {:ok, %Contact{} = contact} = Contacts.update_contact(contact, update_attrs)
       assert contact.developer == false

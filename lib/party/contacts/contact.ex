@@ -17,6 +17,13 @@ defmodule Party.Contacts.Contact do
   def changeset(contact, attrs) do
     contact
     |> cast(attrs, [:first_name, :last_name, :email, :mobile_number, :favorite_color, :developer])
-    |> validate_required([:first_name, :last_name, :email, :mobile_number, :favorite_color, :developer])
+    |> validate_required([
+      :first_name,
+      :last_name,
+      :email,
+      :mobile_number,
+      :favorite_color,
+      :developer
+    ])
   end
 end

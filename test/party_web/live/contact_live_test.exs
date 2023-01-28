@@ -4,9 +4,30 @@ defmodule PartyWeb.ContactLiveTest do
   import Phoenix.LiveViewTest
   import Party.ContactsFixtures
 
-  @create_attrs %{developer: true, email: "some email", favorite_color: :red, first_name: "some first_name", last_name: "some last_name", mobile_number: "some mobile_number"}
-  @update_attrs %{developer: false, email: "some updated email", favorite_color: :green, first_name: "some updated first_name", last_name: "some updated last_name", mobile_number: "some updated mobile_number"}
-  @invalid_attrs %{developer: false, email: nil, favorite_color: nil, first_name: nil, last_name: nil, mobile_number: nil}
+  @create_attrs %{
+    developer: true,
+    email: "some email",
+    favorite_color: :red,
+    first_name: "some first_name",
+    last_name: "some last_name",
+    mobile_number: "some mobile_number"
+  }
+  @update_attrs %{
+    developer: false,
+    email: "some updated email",
+    favorite_color: :green,
+    first_name: "some updated first_name",
+    last_name: "some updated last_name",
+    mobile_number: "some updated mobile_number"
+  }
+  @invalid_attrs %{
+    developer: false,
+    email: nil,
+    favorite_color: nil,
+    first_name: nil,
+    last_name: nil,
+    mobile_number: nil
+  }
 
   defp create_contact(_) do
     contact = contact_fixture()
