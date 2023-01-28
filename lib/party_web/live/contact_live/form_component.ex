@@ -12,30 +12,25 @@ defmodule PartyWeb.ContactLive.FormComponent do
         <:subtitle>Use this form to manage contact records in your database.</:subtitle>
       </.header>
 
-      <.simple_form
-        :let={f}
-        for={@changeset}
-        id="contact-form"
-        phx-target={@myself}
-        phx-change="validate"
-        phx-submit="save"
-      >
-        <.input field={{f, :first_name}} type="text" label="First name" />
-        <.input field={{f, :last_name}} type="text" label="Last name" />
-        <.input field={{f, :email}} type="text" label="Email" />
-        <.input field={{f, :mobile_number}} type="text" label="Mobile number" />
-        <.input
-          field={{f, :favorite_color}}
-          type="select"
-          label="Favorite color"
-          prompt="Choose a value"
-          options={Ecto.Enum.values(Party.Contacts.Contact, :favorite_color)}
-        />
-        <.input field={{f, :developer}} type="checkbox" label="Developer" />
-        <:actions>
-          <.button phx-disable-with="Saving...">Save Contact</.button>
-        </:actions>
-      </.simple_form>
+      <form id="contact-form" phx-target={@myself} phx-change="validate" phx-submit="save">
+        <div class="space-y-8 bg-white mt-10">
+          <.input field={@form[:first_name]} type="text" label="First name" />
+          <.input field={@form[:last_name]} type="text" label="Last name" />
+          <.input field={@form[:email]} type="text" label="Email" />
+          <.input field={@form[:mobile_number]} type="text" label="Mobile number" />
+          <.input
+            field={@form[:favorite_color]}
+            type="select"
+            label="Favorite color"
+            prompt="Choose a value"
+            options={Ecto.Enum.values(Party.Contacts.Contact, :favorite_color)}
+          />
+          <.input field={@form[:developer]} type="checkbox" label="Developer" />
+          <div class="mt-2 flex items-center justify-between gap-6">
+            <.button phx-disable-with="Saving...">Save Contact</.button>
+          </div>
+        </div>
+      </form>
     </div>
     """
   end
@@ -47,7 +42,7 @@ defmodule PartyWeb.ContactLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:changeset, changeset)}
+     |> assign(:form, to_form(changeset))}
   end
 
   @impl true
@@ -57,7 +52,7 @@ defmodule PartyWeb.ContactLive.FormComponent do
       |> Contacts.change_contact(contact_params)
       |> Map.put(:action, :validate)
 
-    {:noreply, assign(socket, :changeset, changeset)}
+    {:noreply, assign(socket, :form, to_form(changeset))}
   end
 
   def handle_event("save", %{"contact" => contact_params}, socket) do
@@ -73,7 +68,7 @@ defmodule PartyWeb.ContactLive.FormComponent do
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
+        {:noreply, assign(socket, :form, to_form(changeset))}
     end
   end
 
@@ -86,7 +81,7 @@ defmodule PartyWeb.ContactLive.FormComponent do
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
+        {:noreply, assign(socket, :form, to_form(changeset))}
     end
   end
 end
