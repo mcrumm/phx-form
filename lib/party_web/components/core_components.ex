@@ -285,6 +285,16 @@ defmodule PartyWeb.CoreComponents do
     |> input()
   end
 
+  def input(%{field: %Phoenix.HTML.FormField{} = f} = assigns) do
+    assigns
+    |> assign(field: nil)
+    |> assign_new(:name, fn -> if assigns.multiple, do: f.name <> "[]", else: f.name end)
+    |> assign_new(:id, fn -> f.id end)
+    |> assign_new(:value, fn -> format_input_value(f.value) end)
+    |> assign_new(:errors, fn -> for err <- f.errors || [], do: translate_error(err) end)
+    |> input()
+  end
+
   def input(%{type: "checkbox"} = assigns) do
     assigns = assign_new(assigns, :checked, fn -> input_equals?(assigns.value, "true") end)
 

@@ -9,11 +9,12 @@ defmodule PartyWeb.PageController do
 
   def foo(conn, params) do
     dbg(params)
-    render(conn, :foo)
+    render(conn, :foo, msg: nil)
   end
 
-  def create(conn, %{"foo" => foo_params}) do
+  def create(conn, foo_params) do
     dbg(foo_params)
-    render(conn, :foo)
+
+    render(conn, :foo, msg: "Received at #{System.os_time(:second) |> DateTime.from_unix!()}")
   end
 end

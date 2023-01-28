@@ -1,3 +1,40 @@
-<.form :let={f} for={@conn.params} as={:foo} action="/form" method="POST">
-  <%= dbg(f[:first_name]) %>
+<p>Please note this page is static.</p>
+
+<.form
+  :let={f}
+  for={@conn.params["foo"] || %{}}
+  as={:foo}
+  action="/foo"
+  method="POST"
+  class="grid grid-cols-2 gap-2"
+>
+  <div class="space-y-8 bg-white mt-10">
+    <.input field={f[:first_name]} type="text" label="First name" />
+    <.input field={f[:last_name]} type="text" label="Last name" />
+    <.input field={f[:email]} type="text" label="Email" />
+    <.input field={f[:mobile_number]} type="text" label="Mobile number" />
+    <.input
+      field={f[:favorite_color]}
+      type="select"
+      label="Favorite color"
+      prompt="Choose a value"
+      options={Ecto.Enum.values(Party.Contacts.Contact, :favorite_color)}
+    />
+    <.input field={f[:developer]} type="checkbox" label="I am devloper" />
+
+    <div class="mt-2 flex items-center justify-between gap-6">
+      <.button type="submit">Submit</.button>
+    </div>
+  </div>
+
+  <div>
+    <p :if={@msg} class="pb-4 font-bold"><%= @msg %></p>
+    <div
+      :for={n <- [:first_name, :last_name, :email, :mobile_number, :favorite_color, :developer]}
+      class="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5"
+    >
+      <dfn><%= f[n].name %></dfn>
+      <%= dbg(f[n]) %>
+    </div>
+  </div>
 </.form>
