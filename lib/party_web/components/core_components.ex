@@ -555,6 +555,15 @@ defmodule PartyWeb.CoreComponents do
     """
   end
 
+  @doc """
+  Dumps vars for debugging.
+
+  Refer also to `PartyWeb.DBG.debug_html/4`.
+  """
+  attr :var, :any, required: true, doc: "The var to be dumped"
+
+  def dump(assigns), do: ~H"<%= dbg(@var) %>"
+
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do

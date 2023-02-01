@@ -33,11 +33,12 @@ defmodule PartyWeb.DBG do
 
   def __html__(result, options) do
     {:safe,
-     "<code><pre>" <>
+     "<code><pre class='outline-1 outline-pink-500 outline-dashed outline-offset-4 my-2'>" <>
        Kernel.inspect(result,
          pretty: true,
          limit: options[:limit] || :infinity,
-         printable_limit: options[:printable_limit] || :infinity
+         printable_limit: options[:printable_limit] || :infinity,
+         width: options[:width] || 34
        ) <> "</pre></code>"}
   end
 end
