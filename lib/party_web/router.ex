@@ -28,6 +28,11 @@ defmodule PartyWeb.Router do
 
     get "/foo", PageController, :foo
     post "/foo", PageController, :create
+
+    live "/survey", SurveyLive, :index
+    live "/survey/steps/1", SurveyLive, :step_1
+    live "/survey/steps/2", SurveyLive, :step_2
+    live "/survey/steps/3", SurveyLive, :step_3
   end
 
   # Other scopes may use custom stacks.
