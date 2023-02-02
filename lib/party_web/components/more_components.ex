@@ -93,4 +93,85 @@ defmodule PartyWeb.MoreComponents do
     <p>todo: render hidden fields</p>
     """
   end
+
+  @doc """
+  Renders a form as a series of step-based fieldsets.
+  """
+  attr :active, :integer, required: true, doc: "The active step index."
+
+  attr :rest, :global,
+    include: ~w(autocomplete name rel enctype novalidate target),
+    doc: "Additional HTML attributes to add to the form tag."
+
+  slot :fieldset, required: true do
+    attr :for, Phoenix.HTML.FormField, required: true, doc: "The form field data."
+    attr :class, :string
+    attr :legend, :string
+    attr :hidden, :boolean
+  end
+
+  def step_form(assigns) do
+    assigns =
+      update(assigns, :fieldset, fn fieldset ->
+        for {fieldset, index} <- Enum.with_index(fieldset) do
+          field = fieldset.for
+          dbg(field, to: :stdio)
+
+          id = to_string(field.form.id <> "_#{field.atom}")
+          name = to_string(field.form.name <> "[#{field.atom}]")
+          params = Map.get(field.form.params, field.name)
+          source = Map.get(field.form.source, field.atom)
+          data = Map.get(field.form.data, field.atom)
+
+          cond do
+            # cardinality: one
+            is_map(field.value) ->
+              fieldset_form = %Phoenix.HTML.Form{
+                source: source || %{},
+                impl: field.form.impl,
+                id: id,
+                name: name,
+                data: data || %{},
+                params: params || %{},
+                hidden: Map.get(fieldset, :hidden, false),
+                options: []
+              }
+
+              dbg(fieldset_form, to: :stdio)
+
+              fieldset
+              |> Map.put(:form, fieldset_form)
+              |> Map.put(:index, index)
+
+            # cardinality: many
+            is_list(field.value) ->
+              raise "todo"
+          end
+        end
+      end)
+
+    ~H"""
+    <form {@rest}>
+      <%= for fieldset <- @fieldset do %>
+        <% # ---Inactive fieldset--- %>
+        <fieldset :if={fieldset.index !== @active} name={fieldset.for.name}>
+          <%= for key <- Map.keys(fieldset.form.data), field = fieldset.form[key] do %>
+            <input type="hidden" name={field.name} value={field.value} />
+          <% end %>
+          <.dump :if={false} var={fieldset.form} />
+        </fieldset>
+
+        <% # ---Active fieldset--- %>
+        <fieldset
+          :if={fieldset.index === @active}
+          class={Map.get(fieldset, :class)}
+          name={fieldset.for.name}
+        >
+          <legend :if={Map.get(fieldset, :legend)}><%= fieldset.legend %></legend>
+          <%= render_slot(fieldset, fieldset.form) %>
+        </fieldset>
+      <% end %>
+    </form>
+    """
+  end
 end

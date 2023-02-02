@@ -33,37 +33,38 @@ defmodule PartyWeb.SurveyLive do
     <.stepper active={@active_step_index}>
       <:step label="Step 1" description="Employee Information" navigate={~p"/survey/steps/1"} />
       <:step label="Step 2" description="Career Goals" navigate={~p"/survey/steps/2"} />
-      <:step label="Step 3" navigate={~p"/survey/steps/3"} />
+      <:step label="Step 3" description="Evaluation" navigate={~p"/survey/steps/3"} />
     </.stepper>
 
     <.header class="py-4"><%= @page_title %></.header>
 
     <div class="grid gap-4 grid-cols-3 grid-rows-1">
       <div>
-        <form>
-          <.reform :let={f} for={@form[:step_1]} active={@live_action == :step_1}>
-            <.input type="text" field={f[:name]} label="What is your name?" />
-          </.reform>
-
-          <.reform :let={f} for={@form[:step_2]} active={@live_action == :step_2}>
-            <.input type="text" field={f[:quest]} label="What is your quest?" />
-          </.reform>
-
-          <.reform :let={f} for={@form[:step_3]} active={@live_action == :step_3}>
-            <.input
-              type="text"
-              field={f[:color]}
-              label="What...is your favorite color?"
-              prompt="Choose a color"
-              options={[{"Red", "red"}, {"green", "Green"}, {"Blue", "blue"}]}
-            />
-          </.reform>
-        </form>
+        <p class="block text-sm font-semibold leading-6 text-zinc-800">FormData</p>
+        <.dump :if={@live_action != :index} var={@form[@live_action].value} />
       </div>
 
       <div>
-        <p class="block text-sm font-semibold leading-6 text-zinc-800">FormData</p>
-        <.dump :if={@live_action != :index} var={@form[@live_action].value} />
+        <p class="block text-sm font-semibold leading-6 text-zinc-800">Form</p>
+        <.step_form active={@active_step_index} phx-change="change" phx-submit="submit">
+          <:fieldset :let={f} for={@form[:step_1]}>
+            <.input type="text" field={f[:name]} label="What is your name?" />
+          </:fieldset>
+
+          <:fieldset :let={f} for={@form[:step_2]}>
+            <.input type="text" field={f[:quest]} label="What is your quest?" />
+          </:fieldset>
+
+          <:fieldset :let={f} for={@form[:step_3]}>
+            <.input
+              type="select"
+              field={f[:color]}
+              label="What...is your favorite color?"
+              prompt="Choose a color"
+              options={[{"Red", "red"}, {"Green", "green"}, {"Blue", "blue"}]}
+            />
+          </:fieldset>
+        </.step_form>
       </div>
 
       <div>
@@ -73,6 +74,15 @@ defmodule PartyWeb.SurveyLive do
       </div>
     </div>
     """
+  end
+
+  def handle_event(event, %{"survey" => survey_params}, socket)
+      when event in ["change", "submit"] do
+    {:noreply,
+     socket
+     |> update(:response, fn _ -> survey_params end)
+     |> update(:form, fn form -> dbg(%{form | params: survey_params}) end)
+     |> update(:last_event, fn _ -> "#{event} at #{DateTime.utc_now()}" end)}
   end
 
   def handle_params(params, _uri, socket) do
@@ -105,6 +115,12 @@ defmodule PartyWeb.SurveyLive do
   end
 
   defp assign_new_form(socket) do
+    assign(socket, form: new_survey_form())
+  end
+
+  defp new_survey_form(params \\ %{}) do
+    form = to_form(params, as: :survey)
+
     initial_values = %{
       :step_1 => %{
         :name => ""
@@ -117,15 +133,9 @@ defmodule PartyWeb.SurveyLive do
       }
     }
 
-    assign(socket, form: new_survey_form(initial_values))
-  end
-
-  defp new_survey_form(initial_values \\ %{}) do
-    form = to_form(initial_values, as: :survey)
-
     # puts the initial values to `form.data` so they will be returned
     # by `Phoenix.HTML.Form.input_value/2`.
-    %Phoenix.HTML.Form{form | data: initial_values}
+    dbg(%Phoenix.HTML.Form{form | data: initial_values})
   end
 
   defp page_title(:index), do: "Survey"
