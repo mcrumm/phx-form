@@ -40,12 +40,7 @@ defmodule PartyWeb.SurveyLive do
 
     <div class="grid gap-4 grid-cols-3 grid-rows-1">
       <div>
-        <p class="block text-sm font-semibold leading-6 text-zinc-800">FormData</p>
-        <.dump :if={@live_action != :index} var={@form[@live_action].value} />
-      </div>
-
-      <div>
-        <p class="block text-sm font-semibold leading-6 text-zinc-800">Form</p>
+        <p class="block text-sm font-semibold leading-6 text-zinc-900">Form</p>
         <.step_form active={@active_step_index} phx-change="change" phx-submit="submit">
           <:fieldset :let={f} for={@form[:step_1]}>
             <.input type="text" field={f[:name]} label="What is your name?" />
@@ -58,7 +53,7 @@ defmodule PartyWeb.SurveyLive do
           <:fieldset :let={f} for={@form[:step_3]}>
             <.input
               type="select"
-              field={f[:color]}
+              field={f[:favorite_color]}
               label="What...is your favorite color?"
               prompt="Choose a color"
               options={[{"Red", "red"}, {"Green", "green"}, {"Blue", "blue"}]}
@@ -68,9 +63,14 @@ defmodule PartyWeb.SurveyLive do
       </div>
 
       <div>
-        <p class="block text-sm font-semibold leading-6 text-zinc-800">Response</p>
+        <p class="block text-sm font-semibold leading-6 text-zinc-900">FormData</p>
+        <.dump :if={@live_action != :index} var={@form[@live_action].value} />
+      </div>
+
+      <div>
+        <p class="block text-sm font-semibold leading-6 text-zinc-900">Last Form Submit</p>
         <.dump :if={@response} var={@response} />
-        <p>Last form event: <%= @last_event %></p>
+        <p :if={@response}><%= @last_event %></p>
       </div>
     </div>
     """
@@ -80,9 +80,11 @@ defmodule PartyWeb.SurveyLive do
       when event in ["change", "submit"] do
     {:noreply,
      socket
-     |> update(:response, fn _ -> survey_params end)
+     |> update(:response, fn old -> if event == "submit", do: survey_params, else: old end)
      |> update(:form, fn form -> dbg(%{form | params: survey_params}) end)
-     |> update(:last_event, fn _ -> "#{event} at #{DateTime.utc_now()}" end)}
+     |> update(:last_event, fn old ->
+       if event == "submit", do: "#{event} at #{DateTime.utc_now()}", else: old
+     end)}
   end
 
   def handle_params(params, _uri, socket) do
