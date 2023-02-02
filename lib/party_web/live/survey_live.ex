@@ -58,6 +58,9 @@ defmodule PartyWeb.SurveyLive do
               prompt="Choose a color"
               options={[{"Red", "red"}, {"Green", "green"}, {"Blue", "blue"}]}
             />
+            <div class="py-4">
+              <.button type="submit">Submit</.button>
+            </div>
           </:fieldset>
         </.step_form>
       </div>
@@ -70,7 +73,7 @@ defmodule PartyWeb.SurveyLive do
       <div>
         <p class="block text-sm font-semibold leading-6 text-zinc-900">Last Form Submit</p>
         <.dump :if={@response} var={@response} />
-        <p :if={@response}><%= @last_event %></p>
+        <p :if={@response}>at <%= @last_event %></p>
       </div>
     </div>
     """
@@ -83,7 +86,7 @@ defmodule PartyWeb.SurveyLive do
      |> update(:response, fn old -> if event == "submit", do: survey_params, else: old end)
      |> update(:form, fn form -> dbg(%{form | params: survey_params}) end)
      |> update(:last_event, fn old ->
-       if event == "submit", do: "#{event} at #{DateTime.utc_now()}", else: old
+       if event == "submit", do: DateTime.utc_now(), else: old
      end)}
   end
 
