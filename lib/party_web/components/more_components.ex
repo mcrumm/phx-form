@@ -119,7 +119,7 @@ defmodule PartyWeb.MoreComponents do
 
           id = to_string(field.form.id <> "_#{field.atom}")
           name = to_string(field.form.name <> "[#{field.atom}]")
-          params = Map.get(field.form.params, field.name)
+          params = Map.get(field.form.params, to_string(field.atom))
           source = Map.get(field.form.source, field.atom)
           data = Map.get(field.form.data, field.atom)
 
@@ -156,6 +156,7 @@ defmodule PartyWeb.MoreComponents do
         <% # ---Inactive fieldset--- %>
         <fieldset :if={fieldset.index !== @active} name={fieldset.for.name}>
           <%= for key <- Map.keys(fieldset.form.data), field = fieldset.form[key] do %>
+            <.dump :if={false} var={field} />
             <input type="hidden" name={field.name} value={field.value} />
           <% end %>
           <.dump :if={false} var={fieldset.form} />
@@ -168,6 +169,7 @@ defmodule PartyWeb.MoreComponents do
           name={fieldset.for.name}
         >
           <legend :if={Map.get(fieldset, :legend)}><%= fieldset.legend %></legend>
+          <.dump :for={key <- Map.keys(fieldset.form.data)} :if={false} var={fieldset.form[key]} />
           <%= render_slot(fieldset, fieldset.form) %>
         </fieldset>
       <% end %>
