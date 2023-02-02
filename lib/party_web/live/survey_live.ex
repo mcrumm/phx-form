@@ -41,15 +41,15 @@ defmodule PartyWeb.SurveyLive do
     <div class="grid gap-4 grid-cols-3 grid-rows-1">
       <div>
         <form>
-          <.reform :let={f} for={to_fieldset(@form[:step_1])} active={@live_action == :step_1}>
+          <.reform :let={f} for={@form[:step_1]} active={@live_action == :step_1}>
             <.input type="text" field={f[:name]} label="What is your name?" />
           </.reform>
 
-          <.reform :let={f} for={to_fieldset(@form[:step_2])} active={@live_action == :step_2}>
+          <.reform :let={f} for={@form[:step_2]} active={@live_action == :step_2}>
             <.input type="text" field={f[:quest]} label="What is your quest?" />
           </.reform>
 
-          <.reform :let={f} for={to_fieldset(@form[:step_3])} active={@live_action == :step_3}>
+          <.reform :let={f} for={@form[:step_3]} active={@live_action == :step_3}>
             <.input
               type="text"
               field={f[:color]}
@@ -132,24 +132,4 @@ defmodule PartyWeb.SurveyLive do
   defp page_title(:step_1), do: "Step 1"
   defp page_title(:step_2), do: "Step 2"
   defp page_title(:step_3), do: "Step 3"
-
-  attr :for, PartyWeb.Fieldset, required: true, doc: "The form field data."
-  attr :active, :boolean, required: true, doc: "Whether or not this fieldset is currently active"
-  slot :inner_block, required: true
-
-  def reform(%{active: true} = assigns) do
-    ~H"""
-    <p>reform for <.dump var={@for} /></p>
-    """
-  end
-
-  def reform(%{active: false} = assigns) do
-    ~H"""
-    <p>todo: render hidden fields</p>
-    """
-  end
-
-  def to_fieldset(%Phoenix.HTML.FormField{} = field) do
-    %PartyWeb.Fieldset{}
-  end
 end
