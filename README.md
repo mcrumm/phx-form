@@ -1,5 +1,8 @@
 # Party
 
+https://user-images.githubusercontent.com/168677/216271074-bbb0bc55-70a8-4fac-b0b2-ee08acd5cc7a.mov
+
+
 To start your Phoenix server:
 
   * Run `mix setup` to install and setup dependencies
