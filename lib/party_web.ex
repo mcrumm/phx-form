@@ -86,6 +86,7 @@ defmodule PartyWeb do
       # Core UI components and translation
       import PartyWeb.CoreComponents
       import PartyWeb.Gettext
+      import PartyWeb.MoreComponents
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS

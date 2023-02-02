@@ -462,8 +462,10 @@ defmodule PartyWeb.CoreComponents do
       <table class="mt-11 w-[40rem] sm:w-full">
         <thead class="text-left text-[0.8125rem] leading-6 text-zinc-500">
           <tr>
-            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col[:label] %></th>
-            <th class="relative p-0 pb-4"><span class="sr-only"><%= gettext("Actions") %></span></th>
+            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col.label %></th>
+            <th :if={@action != []} class="relative p-0 pb-4">
+              <span class="sr-only"><%= gettext("Actions") %></span>
+            </th>
           </tr>
         </thead>
         <tbody class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700">
@@ -554,15 +556,6 @@ defmodule PartyWeb.CoreComponents do
     </div>
     """
   end
-
-  @doc """
-  Dumps vars for debugging.
-
-  Refer also to `PartyWeb.DBG.debug_html/4`.
-  """
-  attr :var, :any, required: true, doc: "The var to be dumped"
-
-  def dump(assigns), do: ~H"<%= dbg(@var) %>"
 
   ## JS Commands
 
