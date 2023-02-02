@@ -31,7 +31,7 @@ defmodule PartyWeb.MoreComponents do
         <li :for={{step, i} <- Enum.with_index(@step)} class="md:flex-1">
           <.link
             aria-current={i == @active && "step"}
-            navigate={step.navigate}
+            patch={step.navigate}
             class={
               cond do
                 i < @active ->

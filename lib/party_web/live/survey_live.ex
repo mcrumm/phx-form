@@ -7,7 +7,7 @@ defmodule PartyWeb.SurveyLive do
       <ol role="list" class="flex items-center space-x-4">
         <li>
           <div>
-            <.link href={~p"/"} class="text-gray-400 hover:text-gray-500">
+            <.link navigate={~p"/"} class="text-gray-400 hover:text-gray-500">
               <Heroicons.home mini class="h-5 w-5 flex-shrink-0" />
               <span class="sr-only">Home</span>
             </.link>
@@ -18,7 +18,7 @@ defmodule PartyWeb.SurveyLive do
           <div class="flex items-center">
             <Heroicons.chevron_right mini class="h-5 w-5 flex-shrink-0 text-gray-400" />
             <.link
-              href={~p"/survey"}
+              navigate={~p"/survey"}
               class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
             >
               Survey
@@ -30,40 +30,11 @@ defmodule PartyWeb.SurveyLive do
       </ol>
     </nav>
 
-    <nav aria-label="Progress">
-      <ol role="list" class="space-y-4 md:flex md:space-y-0 md:space-x-8">
-        <li class="md:flex-1">
-          <!-- Current Step -->
-          <.link
-            navigate={~p"/survey/steps/1"}
-            class="flex flex-col border-l-4 border-indigo-600 py-2 pl-4 md:border-l-0 md:border-t-4 md:pl-0 md:pt-4 md:pb-0"
-            aria-current="step"
-          >
-            <span class="text-sm font-medium text-indigo-600">Step 1</span>
-          </.link>
-        </li>
-
-        <li class="md:flex-1">
-          <!-- Upcoming Step -->
-          <.link
-            navigate={~p"/survey/steps/2"}
-            class="group flex flex-col border-l-4 border-gray-200 py-2 pl-4 hover:border-gray-300 md:border-l-0 md:border-t-4 md:pl-0 md:pt-4 md:pb-0"
-          >
-            <span class="text-sm font-medium text-gray-500 group-hover:text-gray-700">Step 2</span>
-          </.link>
-        </li>
-
-        <li class="md:flex-1">
-          <!-- Upcoming Step -->
-          <.link
-            navigate={~p"/survey/steps/3"}
-            class="group flex flex-col border-l-4 border-gray-200 py-2 pl-4 hover:border-gray-300 md:border-l-0 md:border-t-4 md:pl-0 md:pt-4 md:pb-0"
-          >
-            <span class="text-sm font-medium text-gray-500 group-hover:text-gray-700">Step 3</span>
-          </.link>
-        </li>
-      </ol>
-    </nav>
+    <.stepper active={@active_step_index}>
+      <:step label="Step 1" description="Employee Information" navigate={~p"/survey/steps/1"} />
+      <:step label="Step 2" description="Career Goals" navigate={~p"/survey/steps/2"} />
+      <:step label="Step 3" navigate={~p"/survey/steps/3"} />
+    </.stepper>
 
     <.header class="py-4"><%= @page_title %></.header>
 
@@ -104,11 +75,36 @@ defmodule PartyWeb.SurveyLive do
     """
   end
 
-  def handle_params(_params, _uri, socket) do
-    {:noreply, assign(socket, :page_title, page_title(socket.assigns.live_action))}
+  def handle_params(params, _uri, socket) do
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
   def mount(_params, _session, socket) do
+    socket =
+      socket
+      |> assign_new_form()
+      |> assign(last_event: nil, response: nil)
+
+    {:ok, socket}
+  end
+
+  defp apply_action(socket, live_action, _params) do
+    socket
+    |> assign(:page_title, page_title(live_action))
+    |> set_active_step(live_action)
+  end
+
+  defp set_active_step(socket, live_action) do
+    index =
+      Enum.find_index([:step_1, :step_2, :step_3], fn
+        ^live_action -> true
+        _ -> false
+      end)
+
+    assign(socket, active_step_index: index || -1, active_step: live_action)
+  end
+
+  defp assign_new_form(socket) do
     initial_values = %{
       :step_1 => %{
         :name => ""
@@ -121,7 +117,7 @@ defmodule PartyWeb.SurveyLive do
       }
     }
 
-    {:ok, assign(socket, last_event: nil, response: nil, form: new_survey_form(initial_values))}
+    assign(socket, form: new_survey_form(initial_values))
   end
 
   defp new_survey_form(initial_values \\ %{}) do
