@@ -8,7 +8,7 @@ defmodule PartyWeb.DBG do
     assigns? = env |> Macro.Env.vars() |> Keyword.has_key?(:assigns)
     {_, arity} = env.function
 
-    if component? and assigns? and arity === 1 do
+    if component? and assigns? and arity === 1 and options[:to] !== :stdio do
       quote do
         unquote(__MODULE__).__html__(unquote(code), unquote(options))
       end
