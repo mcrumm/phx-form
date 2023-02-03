@@ -179,9 +179,9 @@ defmodule PartyWeb.CoreComponents do
 
   ## Examples
 
-      <.simple_form :let={f} for={:user} phx-change="validate" phx-submit="save">
-        <.input field={{f, :email}} label="Email"/>
-        <.input field={{f, :username}} label="Username" />
+      <.simple_form for={@form} phx-change="validate" phx-submit="save">
+        <.input field={@form[:email]} label="Email"/>
+        <.input field={@form[:username]} label="Username" />
         <:actions>
           <.button>Save</.button>
         </:actions>
@@ -199,11 +199,11 @@ defmodule PartyWeb.CoreComponents do
 
   def simple_form(assigns) do
     ~H"""
-    <.form :let={f} for={@for} as={@as} {@rest}>
+    <.form for={@for} as={@as} {@rest}>
       <div class="space-y-8 bg-white mt-10">
-        <%= render_slot(@inner_block, f) %>
+        <%= render_slot(@inner_block) %>
         <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
-          <%= render_slot(action, f) %>
+          <%= render_slot(action) %>
         </div>
       </div>
     </.form>

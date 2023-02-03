@@ -7,14 +7,20 @@ defmodule PartyWeb.PageController do
     render(conn, :home, layout: false)
   end
 
-  def foo(conn, params) do
-    dbg(params)
-    render(conn, :foo, msg: nil)
+  def foo(conn, _params) do
+    render(conn, :foo, msg: nil, form: contact_form())
   end
 
-  def create(conn, foo_params) do
-    dbg(foo_params)
+  def create(conn, %{"contact" => contact_params}) do
+    dbg(contact_params)
 
-    render(conn, :foo, msg: "Received at #{System.os_time(:second) |> DateTime.from_unix!()}")
+    render(conn, :foo,
+      msg: "Received at #{System.os_time(:second) |> DateTime.from_unix!()}",
+      form: contact_form(contact_params)
+    )
+  end
+
+  defp contact_form(params \\ %{}) do
+    Phoenix.Component.to_form(params, as: :contact)
   end
 end

@@ -78,6 +78,7 @@ defmodule PartyWeb.MoreComponents do
   @doc """
   Renders a form as a series of step-based fieldsets.
   """
+  attr :for, :any, required: true, doc: "An existing form or the form source data."
   attr :active, :integer, required: true, doc: "The active step index."
 
   attr :rest, :global,
@@ -132,7 +133,7 @@ defmodule PartyWeb.MoreComponents do
       end)
 
     ~H"""
-    <form {@rest}>
+    <.form for={@for} {@rest}>
       <%= for fieldset <- @fieldset do %>
         <% # ---Inactive fieldset--- %>
         <fieldset :if={fieldset.index !== @active} name={fieldset.for.name}>
@@ -154,7 +155,7 @@ defmodule PartyWeb.MoreComponents do
           <%= render_slot(fieldset, fieldset.form) %>
         </fieldset>
       <% end %>
-    </form>
+    </.form>
     """
   end
 end

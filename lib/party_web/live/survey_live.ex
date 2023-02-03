@@ -41,7 +41,7 @@ defmodule PartyWeb.SurveyLive do
     <div class="grid gap-4 grid-cols-3 grid-rows-1">
       <div>
         <p class="block text-sm font-semibold leading-6 text-zinc-900">Form</p>
-        <.step_form active={@active_step_index} phx-change="change" phx-submit="submit">
+        <.step_form for={@form} active={@active_step_index} phx-change="change" phx-submit="submit">
           <:fieldset :let={f} for={@form[:step_1]}>
             <.input type="text" field={f[:name]} label="What is your name?" />
           </:fieldset>
