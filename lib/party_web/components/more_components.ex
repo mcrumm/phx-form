@@ -117,11 +117,11 @@ defmodule PartyWeb.MoreComponents do
           field = fieldset.for
           dbg(field, to: :stdio)
 
-          id = to_string(field.form.id <> "_#{field.atom}")
-          name = to_string(field.form.name <> "[#{field.atom}]")
-          params = Map.get(field.form.params, to_string(field.atom))
-          source = Map.get(field.form.source, field.atom)
-          data = Map.get(field.form.data, field.atom)
+          id = to_string(field.form.id <> "_#{field.field}")
+          name = to_string(field.form.name <> "[#{field.field}]")
+          params = Map.get(field.form.params, to_string(field.field))
+          source = Map.get(field.form.source, field.field)
+          data = Map.get(field.form.data, field.field)
 
           cond do
             # cardinality: one

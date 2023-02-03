@@ -37,7 +37,7 @@ defmodule Party.MixProject do
       {:ecto_sql, "~> 3.6"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 3.3.0-dev",
-       path: "../../phoenixframework/phoenix_html", override: true},
+       github: "phoenixframework/phoenix_html", branch: "mc-field-field", override: true},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.18.3",
        github: "phoenixframework/phoenix_live_view", override: true},
