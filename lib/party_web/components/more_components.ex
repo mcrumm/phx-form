@@ -76,25 +76,6 @@ defmodule PartyWeb.MoreComponents do
   end
 
   @doc """
-  Renders a conditional subform.
-  """
-  attr :for, Phoenix.HTML.FormField, required: true, doc: "The form field data."
-  attr :active, :boolean, required: true, doc: "Whether or not this fieldset is currently active"
-  slot :inner_block, required: true
-
-  def reform(%{active: true} = assigns) do
-    ~H"""
-    <p>reform for <.dump var={@for} /></p>
-    """
-  end
-
-  def reform(%{active: false} = assigns) do
-    ~H"""
-    <p>todo: render hidden fields</p>
-    """
-  end
-
-  @doc """
   Renders a form as a series of step-based fieldsets.
   """
   attr :active, :integer, required: true, doc: "The active step index."
