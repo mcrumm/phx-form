@@ -12,7 +12,13 @@ defmodule PartyWeb.ContactLive.FormComponent do
         <:subtitle>Use this form to manage contact records in your database.</:subtitle>
       </.header>
 
-      <form id="contact-form" phx-target={@myself} phx-change="validate" phx-submit="save">
+      <.simple_form
+        for={@form}
+        id="contact-form"
+        phx-target={@myself}
+        phx-change="validate"
+        phx-submit="save"
+      >
         <div class="space-y-8 bg-white mt-10">
           <.input field={@form[:first_name]} type="text" label="First name" />
           <.input field={@form[:last_name]} type="text" label="Last name" />
@@ -30,7 +36,7 @@ defmodule PartyWeb.ContactLive.FormComponent do
             <.button phx-disable-with="Saving...">Save Contact</.button>
           </div>
         </div>
-      </form>
+      </.simple_form>
     </div>
     """
   end

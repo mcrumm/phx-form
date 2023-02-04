@@ -97,7 +97,7 @@ defmodule PartyWeb.SurveyLive do
   def mount(_params, _session, socket) do
     socket =
       socket
-      |> assign_new_form()
+      |> assign(form: new_survey_form())
       |> assign(last_event: nil, response: nil)
 
     {:ok, socket}
@@ -117,10 +117,6 @@ defmodule PartyWeb.SurveyLive do
       end)
 
     assign(socket, active_step_index: index || -1, active_step: live_action)
-  end
-
-  defp assign_new_form(socket) do
-    assign(socket, form: new_survey_form())
   end
 
   defp new_survey_form(params \\ %{}) do
