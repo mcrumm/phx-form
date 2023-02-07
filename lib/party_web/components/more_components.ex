@@ -87,7 +87,8 @@ defmodule PartyWeb.MoreComponents do
     doc: "Additional HTML attributes to add to the form tag."
 
   slot :fieldset, required: true do
-    attr :for, Phoenix.HTML.FormField, required: true, doc: "The form field data."
+    attr :name, :atom, required: true, doc: "The fieldset name."
+    attr :for, :list, required: true, doc: "The list of fields owned by this fieldset."
     attr :class, :string
     attr :legend, :string
     attr :hidden, :boolean
@@ -95,65 +96,38 @@ defmodule PartyWeb.MoreComponents do
 
   def step_form(assigns) do
     assigns =
-      update(assigns, :fieldset, fn fieldset ->
-        for {fieldset, index} <- Enum.with_index(fieldset) do
-          field = fieldset.for
-          dbg(field, to: :stdio)
-
-          id = to_string(field.form.id <> "_#{field.field}")
-          name = to_string(field.form.name <> "[#{field.field}]")
-          params = Map.get(field.form.params, to_string(field.field))
-          source = Map.get(field.form.source, field.field)
-          data = Map.get(field.form.data, field.field)
-
-          cond do
-            # cardinality: one
-            is_map(field.value) ->
-              fieldset_form = %Phoenix.HTML.Form{
-                source: source || %{},
-                impl: field.form.impl,
-                id: id,
-                name: name,
-                data: data || %{},
-                params: params || %{},
-                hidden: Map.get(fieldset, :hidden, false),
-                options: []
-              }
-
-              dbg(fieldset_form, to: :stdio)
-
-              fieldset
-              |> Map.put(:form, fieldset_form)
-              |> Map.put(:index, index)
-
-            # cardinality: many
-            is_list(field.value) ->
-              raise "todo"
-          end
+      assigns
+      |> update(:for, fn data -> to_form(data, []) end)
+      |> update(:fieldset, fn fieldsets, assigns ->
+        for fieldset <- fieldsets do
+          fieldset
+          |> Map.put(:id, "#{assigns.for.id}-#{fieldset.name}")
+          |> Map.update!(:name, &"#{assigns.for.id}[#{&1}]")
         end
       end)
 
     ~H"""
     <.form for={@for} as={@as} {@rest}>
-      <%= for fieldset <- @fieldset do %>
+      <%= for {fieldset, index} <- Enum.with_index(@fieldset) do %>
         <% # ---Inactive fieldset--- %>
-        <fieldset :if={fieldset.index !== @active} name={fieldset.for.name}>
-          <%= for key <- Map.keys(fieldset.form.data), field = fieldset.form[key] do %>
+        <fieldset :if={index !== @active} name={fieldset.name} id={fieldset.id}>
+          <%= for field <- fieldset.for, field = @for[field] do %>
             <.dump :if={false} var={field} />
             <input type="hidden" name={field.name} value={field.value} />
           <% end %>
-          <.dump :if={false} var={fieldset.form} />
+          <.dump :if={false} var={@for} />
         </fieldset>
 
         <% # ---Active fieldset--- %>
         <fieldset
-          :if={fieldset.index === @active}
+          :if={index === @active}
           class={Map.get(fieldset, :class)}
-          name={fieldset.for.name}
+          name={fieldset.name}
+          id={fieldset.id}
         >
           <legend :if={Map.get(fieldset, :legend)}><%= fieldset.legend %></legend>
-          <.dump :for={key <- Map.keys(fieldset.form.data)} :if={false} var={fieldset.form[key]} />
-          <%= render_slot(fieldset, fieldset.form) %>
+          <.dump :for={field <- fieldset.for} :if={false} var={@for[field]} />
+          <%= render_slot(fieldset) %>
         </fieldset>
       <% end %>
     </.form>

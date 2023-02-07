@@ -41,19 +41,25 @@ defmodule PartyWeb.SurveyLive do
     <div class="grid gap-4 grid-cols-3 grid-rows-1">
       <div>
         <p class="block text-sm font-semibold leading-6 text-zinc-900">Form</p>
-        <.step_form for={@form} active={@active_step_index} phx-change="change" phx-submit="submit">
-          <:fieldset :let={f} for={@form[:step_1]}>
-            <.input type="text" field={f[:name]} label="What is your name?" />
+        <.step_form
+          id="survey-form"
+          for={@form}
+          active={@active_step_index}
+          phx-change="change"
+          phx-submit="submit"
+        >
+          <:fieldset name={:step_1} for={[:name]}>
+            <.input type="text" field={@form[:name]} label="What is your name?" />
           </:fieldset>
 
-          <:fieldset :let={f} for={@form[:step_2]}>
-            <.input type="text" field={f[:quest]} label="What is your quest?" />
+          <:fieldset name={:step_2} for={[:quest]}>
+            <.input type="text" field={@form[:quest]} label="What is your quest?" />
           </:fieldset>
 
-          <:fieldset :let={f} for={@form[:step_3]}>
+          <:fieldset name={:step_3} for={[:favorite_color]}>
             <.input
               type="select"
-              field={f[:favorite_color]}
+              field={@form[:favorite_color]}
               label="What...is your favorite color?"
               prompt="Choose a color"
               options={[{"Red", "red"}, {"Green", "green"}, {"Blue", "blue"}]}
@@ -67,7 +73,7 @@ defmodule PartyWeb.SurveyLive do
 
       <div>
         <p class="block text-sm font-semibold leading-6 text-zinc-900">FormData</p>
-        <.dump :if={@live_action != :index} var={@form[@live_action].value} />
+        <.dump :if={@live_action != :index} var={@form} />
       </div>
 
       <div>
@@ -120,23 +126,7 @@ defmodule PartyWeb.SurveyLive do
   end
 
   defp new_survey_form(params \\ %{}) do
-    form = to_form(params, as: :survey, id: "survey-form")
-
-    initial_values = %{
-      :step_1 => %{
-        :name => ""
-      },
-      :step_2 => %{
-        :quest => ""
-      },
-      :step_3 => %{
-        :favorite_color => ""
-      }
-    }
-
-    # puts the initial values to `form.data` so they will be returned
-    # by `Phoenix.HTML.Form.input_value/2`.
-    dbg(%Phoenix.HTML.Form{form | data: initial_values})
+    to_form(params, as: :survey)
   end
 
   defp page_title(:index), do: "Survey"
