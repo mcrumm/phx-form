@@ -80,7 +80,7 @@ defmodule PartyWeb.MoreComponents do
   """
   attr :for, :any, required: true, doc: "An existing form or the form source data."
   attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
-  attr :active, :integer, required: true, doc: "The active step index."
+  attr :active, :atom, required: true, doc: "The active step"
 
   attr :rest, :global,
     include: ~w(autocomplete name rel enctype novalidate target),
@@ -100,17 +100,15 @@ defmodule PartyWeb.MoreComponents do
       |> update(:for, fn data -> to_form(data, []) end)
       |> update(:fieldset, fn fieldsets, assigns ->
         for fieldset <- fieldsets do
-          fieldset
-          |> Map.put(:id, "#{assigns.for.id}-#{fieldset.name}")
-          |> Map.update!(:name, &"#{assigns.for.id}[#{&1}]")
+          fieldset |> Map.put(:id, "#{assigns.for.id}-#{fieldset.name}")
         end
       end)
 
     ~H"""
     <.form for={@for} as={@as} {@rest}>
-      <%= for {fieldset, index} <- Enum.with_index(@fieldset) do %>
+      <%= for fieldset <- @fieldset do %>
         <% # ---Inactive fieldset--- %>
-        <fieldset :if={index !== @active} name={fieldset.name} id={fieldset.id}>
+        <fieldset :if={fieldset.name != @active} name={fieldset.name} id={fieldset.id}>
           <%= for field <- fieldset.for, field = @for[field] do %>
             <.dump :if={false} var={field} />
             <input type="hidden" name={field.name} value={field.value} />
@@ -120,7 +118,7 @@ defmodule PartyWeb.MoreComponents do
 
         <% # ---Active fieldset--- %>
         <fieldset
-          :if={index === @active}
+          :if={fieldset.name == @active}
           class={Map.get(fieldset, :class)}
           name={fieldset.name}
           id={fieldset.id}

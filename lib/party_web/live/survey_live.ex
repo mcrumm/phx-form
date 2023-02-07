@@ -44,7 +44,7 @@ defmodule PartyWeb.SurveyLive do
         <.step_form
           id="survey-form"
           for={@form}
-          active={@active_step_index}
+          active={@live_action}
           phx-change="change"
           phx-submit="submit"
         >
