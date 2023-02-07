@@ -120,7 +120,7 @@ defmodule PartyWeb.SurveyLive do
   end
 
   defp new_survey_form(params \\ %{}) do
-    form = to_form(params, as: :survey)
+    form = to_form(params, as: :survey, id: "survey-form")
 
     initial_values = %{
       :step_1 => %{
