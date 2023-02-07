@@ -19,23 +19,21 @@ defmodule PartyWeb.ContactLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <div class="space-y-8 bg-white mt-10">
-          <.input field={@form[:first_name]} type="text" label="First name" />
-          <.input field={@form[:last_name]} type="text" label="Last name" />
-          <.input field={@form[:email]} type="text" label="Email" />
-          <.input field={@form[:mobile_number]} type="text" label="Mobile number" />
-          <.input
-            field={@form[:favorite_color]}
-            type="select"
-            label="Favorite color"
-            prompt="Choose a value"
-            options={Ecto.Enum.values(Party.Contacts.Contact, :favorite_color)}
-          />
-          <.input field={@form[:developer]} type="checkbox" label="Developer" />
-          <div class="mt-2 flex items-center justify-between gap-6">
-            <.button phx-disable-with="Saving...">Save Contact</.button>
-          </div>
-        </div>
+        <.input field={@form[:first_name]} type="text" label="First name" />
+        <.input field={@form[:last_name]} type="text" label="Last name" />
+        <.input field={@form[:email]} type="text" label="Email" />
+        <.input field={@form[:mobile_number]} type="text" label="Mobile number" />
+        <.input
+          field={@form[:favorite_color]}
+          type="select"
+          label="Favorite color"
+          prompt="Choose a value"
+          options={Ecto.Enum.values(Party.Contacts.Contact, :favorite_color)}
+        />
+        <.input field={@form[:developer]} type="checkbox" label="Developer" />
+        <:actions>
+          <.button type="submit" phx-disable-with="Saving...">Save Contact</.button>
+        </:actions>
       </.simple_form>
     </div>
     """
