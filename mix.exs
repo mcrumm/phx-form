@@ -39,7 +39,7 @@ defmodule Party.MixProject do
       {:phoenix_html, "~> 3.3.0-dev", github: "phoenixframework/phoenix_html", override: true},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.18.3",
-       github: "phoenixframework/phoenix_live_view", branch: "mc-form-opts", override: true},
+       github: "phoenixframework/phoenix_live_view", override: true},
       {:heroicons, "~> 0.5"},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.7.2"},
