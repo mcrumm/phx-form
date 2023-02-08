@@ -12,13 +12,7 @@ defmodule PartyWeb.ContactLive.FormComponent do
         <:subtitle>Use this form to manage contact records in your database.</:subtitle>
       </.header>
 
-      <.simple_form
-        for={@form}
-        id="contact-form"
-        phx-target={@myself}
-        phx-change="validate"
-        phx-submit="save"
-      >
+      <.simple_form id="contact-form" phx-target={@myself} phx-change="validate" phx-submit="save">
         <.input field={@form[:first_name]} type="text" label="First name" />
         <.input field={@form[:last_name]} type="text" label="Last name" />
         <.input field={@form[:email]} type="text" label="Email" />
@@ -46,7 +40,7 @@ defmodule PartyWeb.ContactLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:form, to_form(changeset))}
+     |> assign_form(changeset)}
   end
 
   @impl true
@@ -56,7 +50,7 @@ defmodule PartyWeb.ContactLive.FormComponent do
       |> Contacts.change_contact(contact_params)
       |> Map.put(:action, :validate)
 
-    {:noreply, assign(socket, :form, to_form(changeset))}
+    {:noreply, assign_form(socket, changeset)}
   end
 
   def handle_event("save", %{"contact" => contact_params}, socket) do
@@ -72,7 +66,7 @@ defmodule PartyWeb.ContactLive.FormComponent do
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :form, to_form(changeset))}
+        {:noreply, assign_form(socket, changeset)}
     end
   end
 
@@ -85,7 +79,11 @@ defmodule PartyWeb.ContactLive.FormComponent do
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :form, to_form(changeset))}
+        {:noreply, assign_form(socket, changeset)}
     end
+  end
+
+  defp assign_form(socket, %Ecto.Changeset{} = changeset) do
+    assign(socket, :form, to_form(changeset))
   end
 end

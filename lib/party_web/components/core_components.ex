@@ -175,11 +175,38 @@ defmodule PartyWeb.CoreComponents do
   end
 
   @doc """
+  Shows the flash group with standard titles and content.
+
+  ## Examples
+
+      <.flash_group flash={@flash} />
+  """
+  attr :flash, :map, required: true, doc: "the map of flash messages"
+
+  def flash_group(assigns) do
+    ~H"""
+    <.flash kind={:info} title="Success!" flash={@flash} />
+    <.flash kind={:error} title="Error!" flash={@flash} />
+    <.flash
+      id="disconnected"
+      kind={:error}
+      title="We can't find the internet"
+      close={false}
+      autoshow={false}
+      phx-disconnected={show("#disconnected")}
+      phx-connected={hide("#disconnected")}
+    >
+      Attempting to reconnect <Heroicons.arrow_path class="ml-1 w-3 h-3 inline animate-spin" />
+    </.flash>
+    """
+  end
+
+  @doc """
   Renders a simple form.
 
   ## Examples
 
-      <.simple_form for={@form} phx-change="validate" phx-submit="save">
+      <.simple_form phx-change="validate" phx-submit="save">
         <.input field={@form[:email]} label="Email"/>
         <.input field={@form[:username]} label="Username" />
         <:actions>
@@ -199,11 +226,11 @@ defmodule PartyWeb.CoreComponents do
 
   def simple_form(assigns) do
     ~H"""
-    <.form for={@for} as={@as} {@rest}>
+    <.form :let={f} for={@for} as={@as} {@rest}>
       <div class="space-y-8 bg-white mt-10">
-        <%= render_slot(@inner_block) %>
+        <%= render_slot(@inner_block, f) %>
         <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
-          <%= render_slot(action) %>
+          <%= render_slot(action, f) %>
         </div>
       </div>
     </.form>
@@ -249,10 +276,10 @@ defmodule PartyWeb.CoreComponents do
 
   ## Examples
 
-      <.input field={{f, :email}} type="email" />
+      <.input field={@form[:email]} type="email" />
       <.input name="my-input" errors={["oh no!"]} />
   """
-  attr :id, :any
+  attr :id, :any, default: nil
   attr :name, :any
   attr :label, :string, default: nil
 
@@ -262,7 +289,7 @@ defmodule PartyWeb.CoreComponents do
                range radio search select tel text textarea time url week)
 
   attr :value, :any
-  attr :field, :any, doc: "a %Phoenix.HTML.Form{}/field name tuple, for example: {f, :email}"
+  attr :field, :any, doc: "a %Phoenix.HTML.Form{}[field] access, for example: @form[:email]"
   attr :errors, :list
   attr :checked, :boolean, doc: "the checked flag for checkbox inputs"
   attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
@@ -272,31 +299,17 @@ defmodule PartyWeb.CoreComponents do
                                    pattern placeholder readonly required rows size step)
   slot :inner_block
 
-  def input(%{field: {f, field}} = assigns) do
+  def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     assigns
-    |> assign(field: nil)
-    |> assign_new(:name, fn ->
-      name = Phoenix.HTML.Form.input_name(f, field)
-      if assigns.multiple, do: name <> "[]", else: name
-    end)
-    |> assign_new(:id, fn -> Phoenix.HTML.Form.input_id(f, field) end)
-    |> assign_new(:value, fn -> format_input_value(Phoenix.HTML.Form.input_value(f, field)) end)
-    |> assign_new(:errors, fn -> translate_errors(f.errors || [], field) end)
-    |> input()
-  end
-
-  def input(%{field: %Phoenix.HTML.FormField{} = f} = assigns) do
-    assigns
-    |> assign(field: nil)
-    |> assign_new(:name, fn -> if assigns.multiple, do: f.name <> "[]", else: f.name end)
-    |> assign_new(:id, fn -> f.id end)
-    |> assign_new(:value, fn -> format_input_value(f.value) end)
-    |> assign_new(:errors, fn -> for err <- f.errors || [], do: translate_error(err) end)
+    |> assign(field: nil, id: assigns.id || field.id)
+    |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
+    |> assign_new(:value, fn -> Phoenix.HTML.Form.normalize_value(assigns.type, field.value) end)
+    |> assign_new(:errors, fn -> Enum.map(field.errors, &translate_error(&1)) end)
     |> input()
   end
 
   def input(%{type: "checkbox"} = assigns) do
-    assigns = assign_new(assigns, :checked, fn -> input_equals?(assigns.value, "true") end)
+    assigns = assign_new(assigns, :checked, fn -> assigns.value == "true" end)
 
     ~H"""
     <label phx-feedback-for={@name} class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
@@ -342,14 +355,14 @@ defmodule PartyWeb.CoreComponents do
         id={@id || @name}
         name={@name}
         class={[
-          input_border(@errors),
           "mt-2 block min-h-[6rem] w-full rounded-lg border-zinc-300 py-[7px] px-[11px]",
           "text-zinc-900 focus:border-zinc-400 focus:outline-none focus:ring-4 focus:ring-zinc-800/5 sm:text-sm sm:leading-6",
-          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 phx-no-feedback:focus:ring-zinc-800/5"
+          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 phx-no-feedback:focus:ring-zinc-800/5",
+          "border-zinc-300 focus:border-zinc-400 focus:ring-zinc-800/5",
+          @errors != [] && "border-rose-400 focus:border-rose-400 focus:ring-rose-400/10"
         ]}
         {@rest}
-      >
-    <%= @value %></textarea>
+      ><%= @value %></textarea>
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
     """
@@ -365,10 +378,11 @@ defmodule PartyWeb.CoreComponents do
         id={@id || @name}
         value={@value}
         class={[
-          input_border(@errors),
           "mt-2 block w-full rounded-lg border-zinc-300 py-[7px] px-[11px]",
           "text-zinc-900 focus:outline-none focus:ring-4 sm:text-sm sm:leading-6",
-          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 phx-no-feedback:focus:ring-zinc-800/5"
+          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 phx-no-feedback:focus:ring-zinc-800/5",
+          "border-zinc-300 focus:border-zinc-400 focus:ring-zinc-800/5",
+          @errors != [] && "border-rose-400 focus:border-rose-400 focus:ring-rose-400/10"
         ]}
         {@rest}
       />
@@ -376,12 +390,6 @@ defmodule PartyWeb.CoreComponents do
     </div>
     """
   end
-
-  defp input_border([] = _errors),
-    do: "border-zinc-300 focus:border-zinc-400 focus:ring-zinc-800/5"
-
-  defp input_border([_ | _] = _errors),
-    do: "border-rose-400 focus:border-rose-400 focus:ring-rose-400/10"
 
   @doc """
   Renders a label.
@@ -462,7 +470,7 @@ defmodule PartyWeb.CoreComponents do
       <table class="mt-11 w-[40rem] sm:w-full">
         <thead class="text-left text-[0.8125rem] leading-6 text-zinc-500">
           <tr>
-            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col.label %></th>
+            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col[:label] %></th>
             <th :if={@action != []} class="relative p-0 pb-4">
               <span class="sr-only"><%= gettext("Actions") %></span>
             </th>
@@ -472,25 +480,23 @@ defmodule PartyWeb.CoreComponents do
           <tr
             :for={row <- @rows}
             id={"#{@id}-#{Phoenix.Param.to_param(row)}"}
-            class="relative group hover:bg-zinc-50"
+            class="group hover:bg-zinc-50"
           >
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
-              class={["p-0", @row_click && "hover:cursor-pointer"]}
+              class={["relative p-0", @row_click && "hover:cursor-pointer"]}
             >
-              <div :if={i == 0}>
-                <span class="absolute h-full w-4 top-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
-                <span class="absolute h-full w-4 top-0 -right-4 group-hover:bg-zinc-50 sm:rounded-r-xl" />
-              </div>
               <div class="block py-4 pr-6">
+                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
                 <span class={["relative", i == 0 && "font-semibold text-zinc-900"]}>
                   <%= render_slot(col, row) %>
                 </span>
               </div>
             </td>
-            <td :if={@action != []} class="p-0 w-14">
+            <td :if={@action != []} class="relative p-0 w-14">
               <div class="relative whitespace-nowrap py-4 text-right text-sm font-medium">
+                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-zinc-50 sm:rounded-r-xl" />
                 <span
                   :for={action <- @action}
                   class="relative ml-4 font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
@@ -638,14 +644,4 @@ defmodule PartyWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
-
-  defp input_equals?(val1, val2) do
-    Phoenix.HTML.html_escape(val1) == Phoenix.HTML.html_escape(val2)
-  end
-
-  defp format_input_value(%struct{} = value) when struct in [NaiveDateTime, DateTime] do
-    Calendar.strftime(value, "%Y-%m-%dT%H:%M")
-  end
-
-  defp format_input_value(other), do: other
 end
