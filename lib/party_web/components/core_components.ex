@@ -309,7 +309,7 @@ defmodule PartyWeb.CoreComponents do
   end
 
   def input(%{type: "checkbox"} = assigns) do
-    assigns = assign_new(assigns, :checked, fn -> assigns.value == "true" end)
+    assigns = assign_new(assigns, :checked, fn -> assigns.value == true end)
 
     ~H"""
     <label phx-feedback-for={@name} class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
