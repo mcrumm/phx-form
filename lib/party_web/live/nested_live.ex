@@ -4,7 +4,7 @@ defmodule PartyWeb.NestedLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.form id="nested-form" phx-change="change" phx-submit="submit">
+    <.form for={@form} id="nested-form" phx-change="change" phx-submit="submit">
       <.input type="text" field={@form[:event_name]} label="Title" />
       <fieldset class="my-4">
         <legend class="py-2">Guests</legend>
