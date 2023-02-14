@@ -41,7 +41,7 @@ defmodule Party.MixProject do
       {:phoenix_live_view, "~> 0.18.13"},
       {:heroicons, "~> 0.5"},
       {:floki, ">= 0.30.0", only: :test},
-      {:phoenix_live_dashboard, "~> 0.7.2"},
+      {:phoenix_live_dashboard, "~> 0.7.2", github: "phoenixframework/phoenix_live_dashboard"},
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.1.8", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.3"},
