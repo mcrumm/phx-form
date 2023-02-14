@@ -33,6 +33,8 @@ defmodule PartyWeb.Router do
     live "/survey/steps/1", SurveyLive, :step_1
     live "/survey/steps/2", SurveyLive, :step_2
     live "/survey/steps/3", SurveyLive, :step_3
+
+    live "/nested", NestedLive, :index
   end
 
   # Other scopes may use custom stacks.
