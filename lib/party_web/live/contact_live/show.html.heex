@@ -19,7 +19,12 @@
 
 <.back navigate={~p"/contacts"}>Back to contacts</.back>
 
-<.modal :if={@live_action == :edit} id="contact-modal" show on_cancel={JS.patch(~p"/contacts/#{@contact}")}>
+<.modal
+  :if={@live_action == :edit}
+  id="contact-modal"
+  show
+  on_cancel={JS.patch(~p"/contacts/#{@contact}")}
+>
   <.live_component
     module={PartyWeb.ContactLive.FormComponent}
     id={@contact.id}
