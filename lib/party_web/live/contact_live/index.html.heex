@@ -7,7 +7,12 @@
   </:actions>
 </.header>
 
-<.table id="contacts" rows={@contacts} row_click={&JS.navigate(~p"/contacts/#{&1}")}>
+<.table
+  id="contacts"
+  rows={@contacts}
+  row_id={&"contacts-#{&1.id}"}
+  row_click={&JS.navigate(~p"/contacts/#{&1}")}
+>
   <:col :let={contact} label="First name"><%= contact.first_name %></:col>
   <:col :let={contact} label="Last name"><%= contact.last_name %></:col>
   <:col :let={contact} label="Email"><%= contact.email %></:col>
