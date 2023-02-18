@@ -75,10 +75,7 @@ defmodule PartyWeb.NestedLive do
   def handle_event("submit", %{"guestlist" => params}, socket) do
     case fake_save_guestlist(socket.assigns.guestlist, params) do
       {:ok, _guestlist} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Guestlist saved!")
-         |> push_navigate(to: "/")}
+        {:noreply, socket |> put_flash(:info, "Guestlist saved!") |> redirect(to: "/")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
