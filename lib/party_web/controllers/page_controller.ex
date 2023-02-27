@@ -11,7 +11,8 @@ defmodule PartyWeb.PageController do
     render(conn, :foo, msg: nil, form: contact_form())
   end
 
-  def create(conn, %{"contact" => contact_params}) do
+  def create(conn, %{"contact" => contact_params} = params) do
+    dbg(params)
     dbg(contact_params)
 
     render(conn, :foo,
