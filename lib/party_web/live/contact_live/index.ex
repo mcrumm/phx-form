@@ -6,7 +6,7 @@ defmodule PartyWeb.ContactLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :contacts, list_contacts())}
+    {:ok, stream(socket, :contacts, Contacts.list_contacts())}
   end
 
   @impl true
@@ -33,14 +33,15 @@ defmodule PartyWeb.ContactLive.Index do
   end
 
   @impl true
+  def handle_info({PartyWeb.ContactLive.FormComponent, {:saved, contact}}, socket) do
+    {:noreply, stream_insert(socket, :contacts, contact)}
+  end
+
+  @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     contact = Contacts.get_contact!(id)
     {:ok, _} = Contacts.delete_contact(contact)
 
-    {:noreply, assign(socket, :contacts, list_contacts())}
-  end
-
-  defp list_contacts do
-    Contacts.list_contacts()
+    {:noreply, stream_delete(socket, :contacts, contact)}
   end
 end

@@ -12,7 +12,13 @@ defmodule PartyWeb.ContactLive.FormComponent do
         <:subtitle>Use this form to manage contact records in your database.</:subtitle>
       </.header>
 
-      <.simple_form id="contact-form" phx-target={@myself} phx-change="validate" phx-submit="save">
+      <.simple_form
+        for={@form}
+        id="contact-form"
+        phx-target={@myself}
+        phx-change="validate"
+        phx-submit="save"
+      >
         <.input field={@form[:first_name]} type="text" label="First name" />
         <.input field={@form[:last_name]} type="text" label="Last name" />
         <.input field={@form[:email]} type="text" label="Email" />
@@ -59,11 +65,13 @@ defmodule PartyWeb.ContactLive.FormComponent do
 
   defp save_contact(socket, :edit, contact_params) do
     case Contacts.update_contact(socket.assigns.contact, contact_params) do
-      {:ok, _contact} ->
+      {:ok, contact} ->
+        notify_parent({:saved, contact})
+
         {:noreply,
          socket
          |> put_flash(:info, "Contact updated successfully")
-         |> push_navigate(to: socket.assigns.navigate)}
+         |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
@@ -72,11 +80,13 @@ defmodule PartyWeb.ContactLive.FormComponent do
 
   defp save_contact(socket, :new, contact_params) do
     case Contacts.create_contact(contact_params) do
-      {:ok, _contact} ->
+      {:ok, contact} ->
+        notify_parent({:saved, contact})
+
         {:noreply,
          socket
          |> put_flash(:info, "Contact created successfully")
-         |> push_navigate(to: socket.assigns.navigate)}
+         |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
@@ -86,4 +96,6 @@ defmodule PartyWeb.ContactLive.FormComponent do
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))
   end
+
+  defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 end
