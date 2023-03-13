@@ -56,12 +56,13 @@ defmodule PartyWeb.ContactLiveTest do
              |> form("#contact-form", contact: @invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
-      {:ok, _, html} =
-        index_live
-        |> form("#contact-form", contact: @create_attrs)
-        |> render_submit()
-        |> follow_redirect(conn, ~p"/contacts")
+      index_live
+      |> form("#contact-form", contact: @create_attrs)
+      |> render_submit()
 
+      assert_patch(index_live)
+
+      html = render(index_live)
       assert html =~ "Contact created successfully"
       assert html =~ "some email"
     end
@@ -78,12 +79,13 @@ defmodule PartyWeb.ContactLiveTest do
              |> form("#contact-form", contact: @invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
-      {:ok, _, html} =
-        index_live
-        |> form("#contact-form", contact: @update_attrs)
-        |> render_submit()
-        |> follow_redirect(conn, ~p"/contacts")
+      index_live
+      |> form("#contact-form", contact: @update_attrs)
+      |> render_submit()
 
+      assert_patch(index_live, ~p"/contacts")
+
+      html = render(index_live)
       assert html =~ "Contact updated successfully"
       assert html =~ "some updated email"
     end
@@ -118,12 +120,13 @@ defmodule PartyWeb.ContactLiveTest do
              |> form("#contact-form", contact: @invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
-      {:ok, _, html} =
-        show_live
-        |> form("#contact-form", contact: @update_attrs)
-        |> render_submit()
-        |> follow_redirect(conn, ~p"/contacts/#{contact}")
+      show_live
+      |> form("#contact-form", contact: @update_attrs)
+      |> render_submit()
 
+      assert_patch(show_live, ~p"/contacts/#{contact}")
+
+      html = render(show_live)
       assert html =~ "Contact updated successfully"
       assert html =~ "some updated email"
     end
